@@ -3,10 +3,10 @@ import SwiftUI
 let baseURL = "https://itunes.apple.com/search"
 
 let query: [String: String] = [
-    "term": "mama d",
+    "term": "Taylor Swift",
     "media": "music",
     "entity": "musicTrack",
-    "limit": "1"
+    "limit": "5"
 ]
 
 var urlComponents = URLComponents(string: baseURL)!

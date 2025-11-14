@@ -1,5 +1,5 @@
 import SwiftUI
-
+import Combine
 // MARK: - Models
 
 struct CardInput {
@@ -58,43 +58,16 @@ struct BasicCardValidator: CardValidating {
     }
 }
 
-// MARK: - View
+class CardViewModel: ObservableObject {
+    @Published var name = ""
+    @Published var cardNumber = ""
+    @Published var securityCode = ""
+    @Published var validationMessage = ""
 
-struct ContentView: View {
-    @State private var name: String = ""
-    @State private var cardNumber: String = ""
-    @State private var securityCode: String = ""
-    @State private var validationMessage: String = ""
+    var validator: CardValidating
 
-    // Injected validator
-    var validator: CardValidating = BasicCardValidator()
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("Credit Card Processor")
-                .font(.title)
-                .bold()
-                .foregroundColor(.blue)
-
-            TextField("Name", text: $name)
-                .textFieldStyle(.roundedBorder)
-
-            TextField("Card Number", text: $cardNumber)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.numberPad)
-
-            SecureField("Security Code", text: $securityCode)
-                .textFieldStyle(.roundedBorder)
-                .keyboardType(.numberPad)
-
-            Button("Submit") {
-                validate()
-            }
-
-            Text(validationMessage)
-                .padding(.top)
-        }
-        .padding()
+    init(validator: CardValidating = BasicCardValidator()) {
+        self.validator = validator
     }
 
     func validate() {
@@ -107,6 +80,41 @@ struct ContentView: View {
         } catch {
             validationMessage = "❌ Unknown error."
         }
+    }
+}
+
+
+// MARK: - View
+
+struct ContentView: View {
+    @StateObject private var viewModel = CardViewModel()
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Credit Card Processor")
+                .font(.title)
+                .bold()
+                .foregroundColor(.blue)
+
+            TextField("Name", text: $viewModel.name)
+                .textFieldStyle(.roundedBorder)
+
+            TextField("Card Number", text: $viewModel.cardNumber)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numberPad)
+
+            SecureField("Security Code", text: $viewModel.securityCode)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numberPad)
+
+            Button("Submit") {
+                viewModel.validate()
+            }
+
+            Text(viewModel.validationMessage)
+                .padding(.top)
+        }
+        .padding()
     }
 }
 
